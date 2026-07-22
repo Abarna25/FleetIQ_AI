@@ -1,0 +1,25 @@
+services:
+  # Node.js Backend API
+  - type: web
+    name: fleetiq-backend
+    env: docker
+    dockerfilePath: ./backend/Dockerfile
+    envVars:
+      - key: PORT
+        value: 5000
+      - key: DATABASE_URL
+        sync: false # User must set this in the Render dashboard manually
+      - key: AI_SERVICE_URL
+        fromService:
+          type: web
+          name: fleetiq-ai-service
+          envVarKey: RENDER_EXTERNAL_URL
+
+  # Python AI Service
+  - type: web
+    name: fleetiq-ai-service
+    env: docker
+    dockerfilePath: ./ai-service/Dockerfile
+    envVars:
+      - key: PORT
+        value: 8000
