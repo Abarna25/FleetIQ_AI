@@ -1,0 +1,44 @@
+name: FleetIQ CI/CD
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm run install:all
+        
+      - name: Prisma Generate
+        run: |
+          cd backend
+          npx prisma generate --schema=../database/prisma/schema.prisma
+
+      - name: Build Frontend
+        run: npm run build:frontend
+
+      - name: Build Backend
+        run: npm run build:backend
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install AI Service dependencies
+        run: |
+          cd ai-service
+          pip install -r requirements.txt
